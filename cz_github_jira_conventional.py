@@ -7,7 +7,7 @@ from commitizen.cz.base import BaseCommitizen
 from commitizen.cz.utils import multiple_line_breaker, required_validator
 from commitizen.cz.exceptions import CzException
 
-__all__ = ["GithubJiraConventionalCz"]
+__all__ = ["GithubJiraConventionalFooterCz"]
 
 
 def parse_subject(text):
@@ -17,7 +17,7 @@ def parse_subject(text):
     return required_validator(text, msg="Subject is required.")
 
 
-class GithubJiraConventionalCz(BaseCommitizen):
+class GithubJiraConventionalFooterCz(BaseCommitizen):
     bump_pattern = defaults.bump_pattern
     bump_map = defaults.bump_map
     commit_parser = defaults.commit_parser
@@ -256,4 +256,4 @@ class InvalidAnswerError(CzException):
     ...
 
 
-discover_this = GithubJiraConventionalCz
+discover_this = GithubJiraConventionalFooterCz
