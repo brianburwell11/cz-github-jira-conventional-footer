@@ -1,6 +1,6 @@
 import os
 import re
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from commitizen import defaults, git, config
 from commitizen.cz.base import BaseCommitizen
@@ -200,7 +200,7 @@ class GithubJiraConventionalFooterCz(BaseCommitizen):
             "\n"
             "see the issue for details on the typos fixed\n"
             "\n"
-            "closes issue #12"
+            "Jira: XX-01"
         )
 
     def schema(self) -> str:
@@ -236,20 +236,59 @@ class GithubJiraConventionalFooterCz(BaseCommitizen):
     def changelog_message_builder_hook(
         self, parsed_message: dict, commit: git.GitCommit
     ) -> dict:
-        """add github and jira links to the readme"""
-        rev = commit.rev
+        """add github and jira links to the readme as badges"""
+
+        rev = commit.rev[:5]
+        github_commit_badge_img = get_badge_image(
+            "", rev, "%23121011", "github", "white"
+        )
+        github_commit_badge = f"[{github_commit_badge_img}](https://github.com/{self.github_repo}/commit/{commit.rev})"
         m = parsed_message["message"]
+        jira_issue_badges = []
         if parsed_message["scope"]:
-            parsed_message["scope"] = " ".join(
-                [
-                    f"[{issue_id}]({self.jira_base_url}/browse/{issue_id})"
-                    for issue_id in parsed_message["scope"].split(",")
-                ]
-            )
+            for issue_id in parsed_message["scope"].split(","):
+                issue_badge_img = get_badge_image(
+                    "",
+                    issue_id.replace("-", "--"),
+                    "dfe1e5",
+                    "jira",
+                    "0052cc",
+                    alt_text=issue_id,
+                )
+                issue_badge = (
+                    f"[{issue_badge_img}]({self.jira_base_url}/browse/{issue_id})"
+                )
+                jira_issue_badges.append(issue_badge)
         parsed_message[
             "message"
-        ] = f"{m} [{rev[:5]}](https://github.com/{self.github_repo}/commit/{commit.rev})"
+        ] = f"{github_commit_badge}{''.join([badge for badge in jira_issue_badges])} {m}"
         return parsed_message
+
+
+def get_badge_image(
+    label: str,
+    value: str,
+    background_color: str,
+    logo: Optional[str] = None,
+    logo_color: Optional[str] = None,
+    style: Optional[str] = None,
+    alt_text: Optional[str] = None,
+) -> str:
+    """get a badge from https://shields.io/ as markdown"""
+
+    if not style:
+        style = "flat-square"
+    if not alt_text:
+        alt_text = value
+    badge_img = (
+        f"https://img.shields.io/badge/-{value}-{background_color}.svg?style={style}"
+    )
+    if logo:
+        badge_img = f"{badge_img}&logo={logo}"
+        if logo_color:
+            badge_img = f"{badge_img}&logoColor={logo_color}"
+    badge_img = f"{badge_img})"
+    return f"![{alt_text}]({badge_img})"
 
 
 class InvalidAnswerError(CzException):
