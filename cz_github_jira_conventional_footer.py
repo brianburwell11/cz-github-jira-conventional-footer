@@ -131,6 +131,12 @@ class GithubJiraConventionalFooterCz(BaseCommitizen):
             },
             {
                 "type": "input",
+                "name": "breaking_change",
+                "message": "Describe the breaking change:\n",
+                "when": lambda x: x["is_breaking_change"],
+            },
+            {
+                "type": "input",
                 "name": "jira_issues",
                 "message": (
                     f'JIRA issue number (multiple "{self.issue_multiple_hint}"). {self.jira_prefix}'
@@ -140,7 +146,7 @@ class GithubJiraConventionalFooterCz(BaseCommitizen):
             {
                 "type": "input",
                 "name": "footer",
-                "message": "Footer. (press [enter] to skip)\n",
+                "message": "Add any additional footers. (press [enter] to skip)\n",
             },
         ]
         return questions
@@ -178,13 +184,17 @@ class GithubJiraConventionalFooterCz(BaseCommitizen):
         body = answers["body"]
         footer = answers["footer"]
         is_breaking_change = answers["is_breaking_change"]
+        jira_issues = answers["jira_issues"]
 
         if scope:
             scope = f"({scope})"
         if body:
             body = f"\n\n{body}"
+        if jira_issues:
+            footer = f"Jira: {jira_issues}\n{footer}"
         if is_breaking_change:
-            footer = f"BREAKING CHANGE: {footer}"
+            breaking_change = answers["breaking_change"]
+            footer = f"BREAKING CHANGE: {breaking_change}\n{footer}"
         if footer:
             footer = f"\n\n{footer}"
 
@@ -194,21 +204,23 @@ class GithubJiraConventionalFooterCz(BaseCommitizen):
 
     def example(self) -> str:
         return (
-            "fix: correct minor typos in code\n"
+            "fix(lang)!: add polish language\n"
             "\n"
-            "see the issue for details on the typos fixed\n"
+            "see the issue for details on the implementation\n"
             "\n"
+            "BREAKING CHANGE: clients must add Polish as a language option\n"
             "Jira: XX-01"
         )
 
     def schema(self) -> str:
         return (
-            "<type>(<scope>): <subject>\n"
+            "<type>(<scope>)(!): <subject>\n"
             "<BLANK LINE>\n"
             "<body>\n"
             "<BLANK LINE>\n"
-            "(BREAKING CHANGE: )<footer>\n",
-            "Jira: <jira_issues>",
+            "(BREAKING CHANGE: <breaking change>)\n"
+            "(Jira: <jira issues>)\n"
+            "<footer>"
         )
 
     def schema_pattern(self) -> str:
