@@ -1,8 +1,7 @@
 commitizen:
+  github_repo: brianburwell11/cz-github-jira-conventional-footer
+  jira_base_url: https://myproject.atlassian.net
+  jira_prefix: XX-
   name: cz_github_jira_conventional_footer
   tag_format: v$version
-  version: 0.0.1
-  jira_prefix: XX-
-  jira_base_url: https://myproject.atlassian.net
-  github_repo: brianburwell11/cz-github-jira-conventional-footer
-  
+  version: 0.1.0
