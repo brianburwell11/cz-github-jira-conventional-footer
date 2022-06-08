@@ -167,15 +167,12 @@ class GithubJiraConventionalFooterCz(BaseCommitizen):
         issues = [i.strip() for i in text.strip().split(",")]
         for issue in issues:
             if not issueRE.fullmatch(issue):
-                raise InvalidAnswerError(f"JIRA scope of '{issue}' is invalid")
+                raise InvalidAnswerError(f"Jira issue of '{issue}' is invalid")
 
         if len(issues) == 1:
             return self.jira_prefix + issues[0]
 
-        return required_validator(
-            ",".join([self.jira_prefix + i for i in issues]),
-            msg="JIRA scope is required",
-        )
+        return ",".join([self.jira_prefix + i for i in issues])
 
     def message(self, answers: dict) -> str:
         prefix = answers["prefix"]
