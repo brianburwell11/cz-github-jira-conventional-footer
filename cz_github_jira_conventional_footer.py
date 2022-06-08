@@ -287,7 +287,7 @@ def get_badge_image(
         badge_img = f"{badge_img}&logo={logo}"
         if logo_color:
             badge_img = f"{badge_img}&logoColor={logo_color}"
-    badge_img = f"{badge_img})"
+    badge_img = f"{badge_img}"
     return f"![{alt_text}]({badge_img})"
 
 
