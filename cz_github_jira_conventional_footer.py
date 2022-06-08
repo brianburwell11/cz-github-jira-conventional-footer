@@ -188,7 +188,7 @@ class GithubJiraConventionalFooterCz(BaseCommitizen):
         if footer:
             footer = f"\n\n{footer}"
 
-        message = f"{prefix}{scope}: {subject}{body}{footer}"
+        message = f"{prefix}{scope}{'!' if is_breaking_change else ''}: {subject}{body}{footer}"
 
         return message
 
@@ -207,7 +207,8 @@ class GithubJiraConventionalFooterCz(BaseCommitizen):
             "<BLANK LINE>\n"
             "<body>\n"
             "<BLANK LINE>\n"
-            "(BREAKING CHANGE: )<footer>"
+            "(BREAKING CHANGE: )<footer>\n",
+            "Jira: <jira_issues>",
         )
 
     def schema_pattern(self) -> str:
