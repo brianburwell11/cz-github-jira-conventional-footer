@@ -1,5 +1,5 @@
 commitizen:
-  name: cz_github_jira_conventional
+  name: cz_github_jira_conventional_footer
   tag_format: v$version
   version: 0.0.1
   jira_prefix: XX-
