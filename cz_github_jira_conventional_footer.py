@@ -131,16 +131,21 @@ class GithubJiraConventionalFooterCz(BaseCommitizen):
             },
             {
                 "type": "input",
-                "name": "footer",
+                "name": "jira_issues",
                 "message": (
-                    "Footer. Information about Breaking Changes and "
-                    "reference issues that this commit closes: (press [enter] to skip)\n"
+                    f'JIRA issue number (multiple "{self.issue_multiple_hint}"). {self.jira_prefix}'
                 ),
+                "filter": self.parse_jira_issues,
+            },
+            {
+                "type": "input",
+                "name": "footer",
+                "message": "Footer. (press [enter] to skip)\n",
             },
         ]
         return questions
 
-    def parse_scope(self, text):
+    def parse_jira_issues(self, text):
         """
         Require and validate the scope to be Jira ids.
         Parse the scope and add Jira prefixes if they were specified in the config.
