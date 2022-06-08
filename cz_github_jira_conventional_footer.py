@@ -10,13 +10,6 @@ from commitizen.cz.exceptions import CzException
 __all__ = ["GithubJiraConventionalFooterCz"]
 
 
-def parse_subject(text):
-    if isinstance(text, str):
-        text = text.strip(".").strip()
-
-    return required_validator(text, msg="Subject is required.")
-
-
 class GithubJiraConventionalFooterCz(BaseCommitizen):
     bump_pattern = defaults.bump_pattern
     bump_map = defaults.bump_map
@@ -110,9 +103,9 @@ class GithubJiraConventionalFooterCz(BaseCommitizen):
                 "type": "input",
                 "name": "scope",
                 "message": (
-                    f'JIRA issue number (multiple "{self.issue_multiple_hint}"). {self.jira_prefix}'
+                    "What is the scope of this change? (class or file name): (press [enter] to skip)\n"
                 ),
-                "filter": self.parse_scope,
+                "filter": parse_scope,
             },
             {
                 "type": "input",
@@ -263,6 +256,24 @@ class GithubJiraConventionalFooterCz(BaseCommitizen):
             "message"
         ] = f"{github_commit_badge}{''.join([badge for badge in jira_issue_badges])} {m}"
         return parsed_message
+
+
+def parse_scope(text):
+    if not text:
+        return ""
+
+    scope = text.strip().split()
+    if len(scope) == 1:
+        return scope[0]
+
+    return "-".join(scope)
+
+
+def parse_subject(text):
+    if isinstance(text, str):
+        text = text.strip(".").strip()
+
+    return required_validator(text, msg="Subject is required.")
 
 
 def get_badge_image(
