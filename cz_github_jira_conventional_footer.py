@@ -3,9 +3,11 @@ import re
 from typing import Any, Dict, List, Optional
 
 from commitizen import defaults, git, config
+from commitizen.exceptions import CommitizenException, ExitCode
 from commitizen.cz.base import BaseCommitizen
 from commitizen.cz.utils import multiple_line_breaker, required_validator
 from commitizen.cz.exceptions import CzException
+from yaml.scanner import Scanner, ScannerError
 
 __all__ = ["GithubJiraConventionalFooterCz"]
 
@@ -15,6 +17,29 @@ CONVENTIONAL_COMMIT_REGEX = (
     r"(?:\n^\n(?P<footers>.*))+)"
 )
 """regular expression pattern with named groups for conventional commits v1.0.0-beta.4"""
+
+
+class MissingConfigKey(CommitizenException):
+    """Exception raised when a required config key is not defined."""
+
+    exit_code = ExitCode.INVALID_CONFIGURATION
+
+    def __init__(self, config_key: str):
+        super().__init__(config_key)
+        self.message = f"Missing required config key: {config_key}"
+
+
+class InvalidConfigValue(CommitizenException):
+    """Exception raised when a config value doesn't match a criteria."""
+
+    exit_code = ExitCode.INVALID_CONFIGURATION
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
+class InvalidAnswerError(CzException):
+    ...
 
 
 class GithubJiraConventionalFooterCz(BaseCommitizen):
@@ -34,7 +59,18 @@ class GithubJiraConventionalFooterCz(BaseCommitizen):
     jira_token = "Jira: "
 
     # read the config file and replace default if setting is defined
-    conf = config.read_cfg()
+    try:
+        conf = config.read_cfg()
+    except ScannerError as e:
+        if e.problem == "mapping values are not allowed here":
+            error_message = (
+                "Raw mapping values not allowed.\n\n"
+                + 'Are you trying to define a footer token containing ":"? If so, be sure to enclose your defined value in quotation marks. For example,\n'
+                + '\tjira_token: "resolves-issue: "'
+            )
+            raise InvalidConfigValue(error_message)
+        raise
+
     if "jira_prefix" in conf.settings:
         jira_prefix = conf.settings["jira_prefix"]
         issue_multiple_hint = "42, 123"
@@ -45,18 +81,15 @@ class GithubJiraConventionalFooterCz(BaseCommitizen):
         jira_base_url = conf.settings["jira_base_url"]
         github_repo = conf.settings["github_repo"]
     except KeyError as e:
-        print(f"Please add the key {e} to your .cz.yaml|json|toml config file.")
-        quit()
+        raise MissingConfigKey(e)
 
     # validate format for config settings
     if re.fullmatch(r"^(?i)BREAKING( |-)CHANGE( #|: )?", jira_token):
-        print(
-            "Invalid jira_token set. Token cannot match regex ^(?i)BREAKING( |-)CHANGE( #|: )"
+        raise InvalidConfigValue(
+            "jira_token cannot match regex ^(?i)BREAKING( |-)CHANGE( #|: )"
         )
-        quit()
     if not (re.fullmatch(r"^(?i)[\w-]+(?: #|: )$", jira_token)):
-        print("Invalid jira_token set. Token must match regex ^(?i)[\w-]+( #|: )?$")
-        quit()
+        raise InvalidConfigValue("jira_token must match regex ^(?i)[\w-]+( #|: )?$")
 
     def questions(self) -> List[Dict[str, Any]]:
         questions: List[Dict[str, Any]] = [
@@ -342,10 +375,6 @@ def get_badge_image(
             badge_img = f"{badge_img}&logoColor={logo_color}"
     badge_img = f"{badge_img}"
     return f"![{alt_text}]({badge_img})"
-
-
-class InvalidAnswerError(CzException):
-    ...
 
 
 discover_this = GithubJiraConventionalFooterCz
