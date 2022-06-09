@@ -1,4 +1,4 @@
-## Unreleased
+## v0.2.0 (2022-06-09)
 
 ### Feat
 
@@ -8,3 +8,7 @@
 ### Fix
 
 - **message**: [![48ee9](https://img.shields.io/badge/-48ee9-%23121011.svg?style=flat-square&logo=github&logoColor=white)](https://github.com/brianburwell11/cz-github-jira-conventional-footer/commit/48ee9e8a032dde2dcebfdd8f2ed6c94465e9cca7)[![XX-00](https://img.shields.io/badge/-XX--00-dfe1e5.svg?style=flat-square&logo=jira&logoColor=0052cc)](https://myproject.atlassian.net/browse/XX-00) add `!` after the type (or scope) of breaking change commits
+
+## v0.1.0 (2022-06-07)
+
+## v1.0.0 (2021-08-13)
