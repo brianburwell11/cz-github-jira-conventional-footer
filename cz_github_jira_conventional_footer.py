@@ -43,20 +43,7 @@ class InvalidAnswerError(CzException):
 
 
 class GithubJiraConventionalFooterCz(BaseCommitizen):
-    # set defaults for optional config values
     commit_parser = CONVENTIONAL_COMMIT_REGEX
-    bump_pattern = defaults.bump_pattern
-    bump_map = defaults.bump_map
-    changelog_pattern = defaults.bump_pattern
-    change_type_map = {
-        "feat": "Feat",
-        "fix": "Fix",
-        "refactor": "Refactor",
-        "perf": "Perf",
-    }
-    jira_prefix = ""
-    issue_multiple_hint = "XZ-42, XY-123"
-    jira_token = "Jira: "
 
     # read the config file and replace default if setting is defined
     try:
@@ -71,16 +58,25 @@ class GithubJiraConventionalFooterCz(BaseCommitizen):
             raise InvalidConfigValue(error_message)
         raise
 
-    if "jira_prefix" in conf.settings:
-        jira_prefix = conf.settings["jira_prefix"]
+    jira_prefix = conf.settings.get("jira_prefix", "")
+    issue_multiple_hint = "XZ-42, XY-123"
+    if jira_prefix:
         issue_multiple_hint = "42, 123"
-    jira_token = str(conf.settings.get("jira_token", jira_token))
+    jira_token = str(conf.settings.get("jira_token", "Jira: "))
     if not (jira_token.endswith(": ") or jira_token.endswith(" #")):
         jira_token = f"{jira_token}: "
-    bump_pattern = conf.settings.get("bump_pattern", bump_pattern)
-    bump_map = conf.settings.get("bump_map", bump_map)
-    changelog_pattern = conf.settings.get("changelog_pattern", changelog_pattern)
-    change_type_map = conf.settings.get("change_type_map", change_type_map)
+    bump_pattern = conf.settings.get("bump_pattern", defaults.bump_pattern)
+    bump_map = conf.settings.get("bump_map", defaults.bump_map)
+    changelog_pattern = conf.settings.get("changelog_pattern", defaults.bump_pattern)
+    change_type_map = conf.settings.get(
+        "change_type_map",
+        {
+            "feat": "Feat",
+            "fix": "Fix",
+            "refactor": "Refactor",
+            "perf": "Perf",
+        },
+    )
     try:
         jira_base_url = conf.settings["jira_base_url"]
         github_repo = conf.settings["github_repo"]
