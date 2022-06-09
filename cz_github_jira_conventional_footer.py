@@ -77,6 +77,10 @@ class GithubJiraConventionalFooterCz(BaseCommitizen):
     jira_token = str(conf.settings.get("jira_token", jira_token))
     if not (jira_token.endswith(": ") or jira_token.endswith(" #")):
         jira_token = f"{jira_token}: "
+    bump_pattern = conf.settings.get("bump_pattern", bump_pattern)
+    bump_map = conf.settings.get("bump_map", bump_map)
+    changelog_pattern = conf.settings.get("changelog_pattern", changelog_pattern)
+    change_type_map = conf.settings.get("change_type_map", change_type_map)
     try:
         jira_base_url = conf.settings["jira_base_url"]
         github_repo = conf.settings["github_repo"]
