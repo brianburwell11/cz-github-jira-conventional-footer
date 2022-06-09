@@ -9,12 +9,19 @@ from commitizen.cz.exceptions import CzException
 
 __all__ = ["GithubJiraConventionalFooterCz"]
 
+CONVENTIONAL_COMMIT_REGEX = (
+    r"^(?P<change_type>feat|fix|refactor|perf)(?:\((?P<scope>\w+)\))?(?P<breaking>\!)?: (?P<subject>.*)"
+    r"(?s:\n\n(?P<body>^(?:(?!^\n^{BREAKING(?: |-)CHANGE|[\w-]+}{ #|: }).)*)?"
+    r"(?:\n^\n(?P<footers>.*))+)"
+)
+"""regular expression pattern with named groups for conventional commits v1.0.0-beta.4"""
+
 
 class GithubJiraConventionalFooterCz(BaseCommitizen):
     bump_pattern = defaults.bump_pattern
     bump_map = defaults.bump_map
-    commit_parser = defaults.commit_parser
     changelog_pattern = defaults.bump_pattern
+    commit_parser = CONVENTIONAL_COMMIT_REGEX
 
     # Read the config file and check if required settings are available
     conf = config.read_cfg()
@@ -167,9 +174,9 @@ class GithubJiraConventionalFooterCz(BaseCommitizen):
 
     def parse_jira_issues(self, text):
         """
-        Require and validate the scope to be Jira ids.
-        Parse the scope and add Jira prefixes if they were specified in the config.
+        Parse the issues given and add Jira prefixes if they were specified in the config.
         """
+
         if self.jira_prefix:
             issueRE = re.compile(r"\d+")
         else:
@@ -230,7 +237,7 @@ class GithubJiraConventionalFooterCz(BaseCommitizen):
             "<body>\n"
             "<BLANK LINE>\n"
             "(BREAKING CHANGE: <breaking change>)\n"
-            "(Jira: <jira issues>)\n"
+            "(<jira_token><jira issues>)\n"
             "<footer>"
         )
 
@@ -265,10 +272,21 @@ class GithubJiraConventionalFooterCz(BaseCommitizen):
             "", rev, "%23121011", "github", "white"
         )
         github_commit_badge = f"[{github_commit_badge_img}](https://github.com/{self.github_repo}/commit/{commit.rev})"
-        m = parsed_message["message"]
+
         jira_issue_badges = []
-        if parsed_message["scope"]:
-            for issue_id in parsed_message["scope"].split(","):
+        if parsed_message["footers"]:
+            jira_issues = []
+            for footer_value in re.findall(
+                rf"^Jira: (?P<issues>.+)$",
+                parsed_message["footers"],
+                re.IGNORECASE | re.MULTILINE,
+            ):
+                [
+                    jira_issues.append(issue_id.strip())
+                    for issue_id in footer_value.split(",")
+                ]
+
+            for issue_id in jira_issues:
                 issue_badge_img = get_badge_image(
                     "",
                     issue_id.replace("-", "--"),
@@ -283,7 +301,7 @@ class GithubJiraConventionalFooterCz(BaseCommitizen):
                 jira_issue_badges.append(issue_badge)
         parsed_message[
             "message"
-        ] = f"{github_commit_badge}{''.join([badge for badge in jira_issue_badges])} {m}"
+        ] = f"{github_commit_badge}{''.join([badge for badge in jira_issue_badges])} {parsed_message['subject']}"
         return parsed_message
 
 
