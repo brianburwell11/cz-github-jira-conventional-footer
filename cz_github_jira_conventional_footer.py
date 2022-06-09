@@ -18,25 +18,37 @@ CONVENTIONAL_COMMIT_REGEX = (
 
 
 class GithubJiraConventionalFooterCz(BaseCommitizen):
+    # set defaults for optional config values
+    commit_parser = CONVENTIONAL_COMMIT_REGEX
     bump_pattern = defaults.bump_pattern
     bump_map = defaults.bump_map
     changelog_pattern = defaults.bump_pattern
-    commit_parser = CONVENTIONAL_COMMIT_REGEX
+    change_type_map = {
+        "feat": "Feat",
+        "fix": "Fix",
+        "refactor": "Refactor",
+        "perf": "Perf",
+    }
+    jira_prefix = ""
+    issue_multiple_hint = "XZ-42, XY-123"
+    jira_token = "Jira: "
 
-    # Read the config file and check if required settings are available
+    # read the config file and replace default if setting is defined
     conf = config.read_cfg()
     if "jira_prefix" in conf.settings:
         jira_prefix = conf.settings["jira_prefix"]
         issue_multiple_hint = "42, 123"
-    else:
-        jira_prefix = ""
-        issue_multiple_hint = "XZ-42, XY-123"
-    if "jira_token" in conf.settings:
-        jira_token = str(conf.settings["jira_token"])
-        if not (jira_token.endswith(": ") or jira_token.endswith(" #")):
-            jira_token = f"{jira_token}: "
-    else:
-        jira_token = "Jira: "
+    jira_token = str(conf.settings.get("jira_token", jira_token))
+    if not (jira_token.endswith(": ") or jira_token.endswith(" #")):
+        jira_token = f"{jira_token}: "
+    try:
+        jira_base_url = conf.settings["jira_base_url"]
+        github_repo = conf.settings["github_repo"]
+    except KeyError as e:
+        print(f"Please add the key {e} to your .cz.yaml|json|toml config file.")
+        quit()
+
+    # validate format for config settings
     if re.fullmatch(r"^(?i)BREAKING( |-)CHANGE( #|: )?", jira_token):
         print(
             "Invalid jira_token set. Token cannot match regex ^(?i)BREAKING( |-)CHANGE( #|: )"
@@ -45,23 +57,6 @@ class GithubJiraConventionalFooterCz(BaseCommitizen):
     if not (re.fullmatch(r"^(?i)[\w-]+(?: #|: )$", jira_token)):
         print("Invalid jira_token set. Token must match regex ^(?i)[\w-]+( #|: )?$")
         quit()
-    if "jira_base_url" not in conf.settings:
-        print(
-            "Please add the key jira_base_url to your .cz.yaml|json|toml config file."
-        )
-        quit()
-    if "github_repo" not in conf.settings:
-        print("Please add the key github_repo to your .cz.yaml|json|toml config file.")
-        quit()
-    jira_base_url = conf.settings["jira_base_url"]
-    github_repo = conf.settings["github_repo"]
-    # if "change_type_map" not in conf.settings:
-    change_type_map = {
-        "feat": "Feat",
-        "fix": "Fix",
-        "refactor": "Refactor",
-        "perf": "Perf",
-    }
 
     def questions(self) -> List[Dict[str, Any]]:
         questions: List[Dict[str, Any]] = [
