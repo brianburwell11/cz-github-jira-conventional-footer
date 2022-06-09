@@ -24,6 +24,20 @@ class GithubJiraConventionalFooterCz(BaseCommitizen):
     else:
         jira_prefix = ""
         issue_multiple_hint = "XZ-42, XY-123"
+    if "jira_token" in conf.settings:
+        jira_token = str(conf.settings["jira_token"])
+        if not (jira_token.endswith(": ") or jira_token.endswith(" #")):
+            jira_token = f"{jira_token}: "
+    else:
+        jira_token = "Jira: "
+    if re.fullmatch(r"^(?i)BREAKING( |-)CHANGE( #|: )?", jira_token):
+        print(
+            "Invalid jira_token set. Token cannot match regex ^(?i)BREAKING( |-)CHANGE( #|: )"
+        )
+        quit()
+    if not (re.fullmatch(r"^(?i)[\w-]+(?: #|: )$", jira_token)):
+        print("Invalid jira_token set. Token must match regex ^(?i)[\w-]+( #|: )?$")
+        quit()
     if "jira_base_url" not in conf.settings:
         print(
             "Please add the key jira_base_url to your .cz.yaml|json|toml config file."
@@ -188,7 +202,7 @@ class GithubJiraConventionalFooterCz(BaseCommitizen):
         if body:
             body = f"\n\n{body}"
         if jira_issues:
-            footer = f"Jira: {jira_issues}\n{footer}"
+            footer = f"{self.jira_token}{jira_issues}\n{footer}"
         if is_breaking_change:
             breaking_change = answers["breaking_change"]
             footer = f"BREAKING CHANGE: {breaking_change}\n{footer}"
