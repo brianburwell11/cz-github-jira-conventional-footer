@@ -1,3 +1,14 @@
+## v0.3.0 (2022-06-09)
+
+### Feat
+
+- **config**: [![94fe6](https://img.shields.io/badge/-94fe6-%23121011.svg?style=flat-square&logo=github&logoColor=white)](https://github.com/brianburwell11/cz-github-jira-conventional-footer/commit/94fe63d6d84897f2d36dfa4c0054c676db6cbfb9)[![XX-99](https://img.shields.io/badge/-XX--99-dfe1e5.svg?style=flat-square&logo=jira&logoColor=0052cc)](https://myproject.atlassian.net/browse/XX-99) add optional config for standard commitizen settings
+
+### Refactor
+
+- **config**: [![82b37](https://img.shields.io/badge/-82b37-%23121011.svg?style=flat-square&logo=github&logoColor=white)](https://github.com/brianburwell11/cz-github-jira-conventional-footer/commit/82b375b41aba9f8c52a2843ebfef5b6c49f4b979) raise custom exceptions for invalid config settings
+- [![205e5](https://img.shields.io/badge/-205e5-%23121011.svg?style=flat-square&logo=github&logoColor=white)](https://github.com/brianburwell11/cz-github-jira-conventional-footer/commit/205e5ef59239fba8274188e2a4795021e75f2021)[![XX-06](https://img.shields.io/badge/-XX--06-dfe1e5.svg?style=flat-square&logo=jira&logoColor=0052cc)](https://myproject.atlassian.net/browse/XX-06) convert config checks to EAFP
+
 ## v0.2.0 (2022-06-09)
 
 ### Feat
