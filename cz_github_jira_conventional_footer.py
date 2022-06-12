@@ -12,9 +12,8 @@ from yaml.scanner import Scanner, ScannerError
 __all__ = ["GithubJiraConventionalFooterCz"]
 
 CONVENTIONAL_COMMIT_REGEX = (
-    r"^(?P<change_type>feat|fix|refactor|perf)(?:\((?P<scope>\w+)\))?(?P<breaking>\!)?: (?P<subject>.*)"
-    r"(?s:\n\n(?P<body>^(?:(?!^\n^{BREAKING(?: |-)CHANGE|[\w-]+}{ #|: }).)*)?"
-    r"(?:\n^\n(?P<footers>.*))+)"
+    r"(?s)\A(?P<change_type>feat|fix|refactor|perf)(?:\((?P<scope>\w+)\))?(?P<breaking>!)?: (?P<subject>.[^\n]*)"
+    r"(?:\n^\n^(?P<body>.*))?"
 )
 """regular expression pattern with named groups for conventional commits v1.0.0-beta.4"""
 
@@ -302,16 +301,16 @@ class GithubJiraConventionalFooterCz(BaseCommitizen):
         github_commit_badge = f"[{github_commit_badge_img}](https://github.com/{self.github_repo}/commit/{commit.rev})"
 
         jira_issue_badges = []
-        if parsed_message["footers"]:
+        if parsed_message["body"]:
             jira_issues = []
-            for footer_value in re.findall(
-                rf"^Jira: (?P<issues>.+)$",
-                parsed_message["footers"],
-                re.IGNORECASE | re.MULTILINE,
+            for jira_footer in re.findall(
+                rf"^{self.jira_token}(?P<issues>.+)$",
+                parsed_message["body"],
+                re.IGNORECASE,
             ):
                 [
                     jira_issues.append(issue_id.strip())
-                    for issue_id in footer_value.split(",")
+                    for issue_id in jira_footer.split(",")
                 ]
 
             for issue_id in jira_issues:
@@ -327,9 +326,15 @@ class GithubJiraConventionalFooterCz(BaseCommitizen):
                     f"[{issue_badge_img}]({self.jira_base_url}/browse/{issue_id})"
                 )
                 jira_issue_badges.append(issue_badge)
-        parsed_message[
-            "message"
-        ] = f"{github_commit_badge}{''.join([badge for badge in jira_issue_badges])} {parsed_message['subject']}"
+
+        scope = parsed_message["scope"]
+        parsed_message["scope"] = None
+
+        parsed_message["message"] = (
+            f"{github_commit_badge}{''.join([badge for badge in jira_issue_badges])}"
+            f"{f' _({scope})_' if scope is not None else ''} "
+            f"{parsed_message['subject']}"
+        )
         return parsed_message
 
 
