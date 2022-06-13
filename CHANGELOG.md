@@ -1,7 +1,8 @@
-## Unreleased
+## v1.0.0 (2022-06-13)
 
-### Fix
+### Bug Fixes
 
+- [![53997](https://img.shields.io/badge/-53997-%23121011.svg?style=flat-square&logo=github&logoColor=white)](https://github.com/brianburwell11/cz-github-jira-conventional-footer/commit/53997cee306c596191f52ce44976f338f0013e1c)[![XX-99](https://img.shields.io/badge/-XX--99-dfe1e5.svg?style=flat-square&logo=jira&logoColor=0052cc)](https://myproject.atlassian.net/browse/XX-99) add `re.MULTILINE` flag to find Jira footers
 - [![33855](https://img.shields.io/badge/-33855-%23121011.svg?style=flat-square&logo=github&logoColor=white)](https://github.com/brianburwell11/cz-github-jira-conventional-footer/commit/338556f2d9bb1b19c1f347eef5428b641eb98782) correct invalid regex pattern in commit_parser
 
 ## v0.3.0 (2022-06-09)
