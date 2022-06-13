@@ -1,3 +1,9 @@
+## v1.0.2 (2022-06-13)
+
+### Bug Fixes
+
+- [![0af1d](https://img.shields.io/badge/-0af1d-%23121011.svg?style=flat-square&logo=github&logoColor=white)](https://github.com/brianburwell11/cz-github-jira-conventional-footer/commit/0af1dddfcc28b4e781d1ffbae48e51b89f0954cb) _(build)_ remove third-party import of yaml in setup script
+
 ## v1.0.1 (2022-06-13)
 
 ### Bug Fixes
