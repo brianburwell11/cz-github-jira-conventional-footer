@@ -66,14 +66,14 @@ class GithubJiraConventionalFooterCz(BaseCommitizen):
         jira_token = f"{jira_token}: "
     bump_pattern = conf.settings.get("bump_pattern", defaults.bump_pattern)
     bump_map = conf.settings.get("bump_map", defaults.bump_map)
-    changelog_pattern = conf.settings.get("changelog_pattern", defaults.bump_pattern)
+    changelog_pattern = conf.settings.get("changelog_pattern", bump_pattern)
     change_type_map = conf.settings.get(
         "change_type_map",
         {
-            "feat": "Feat",
-            "fix": "Fix",
+            "feat": "Features",
+            "fix": "Bug Fixes",
             "refactor": "Refactor",
-            "perf": "Perf",
+            "perf": "Performance Improvements",
         },
     )
     try:
