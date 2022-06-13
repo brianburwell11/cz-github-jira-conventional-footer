@@ -20,7 +20,7 @@ setup(
     author="Brian Burwell",
     author_email="brianburwell11@gmail.com",
     license="MIT",
-    url="https://github.com/brianburwell/cz-github-jira-conventional-footer",
+    url="https://github.com/brianburwell11/cz-github-jira-conventional-footer",
     install_requires=["commitizen"],
     description="Extend the commitizen tools to create conventional commits and changelog that link to Jira and GitHub.",
     long_description=long_description,
