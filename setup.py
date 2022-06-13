@@ -1,15 +1,10 @@
+__version__ = "1.0.2"
+
 from os import path
 from setuptools import setup
-from yaml import full_load
 
 
 this_directory = path.abspath(path.dirname(__file__))
-with open(path.join(this_directory, ".cz.yaml"), "r") as f:
-    try:
-        config_values = full_load(f)
-        __version__ = config_values["commitizen"]["version"]
-    except:
-        raise
 with open(path.join(this_directory, "README.md"), encoding="utf-8") as f:
     long_description = f.read()
 
