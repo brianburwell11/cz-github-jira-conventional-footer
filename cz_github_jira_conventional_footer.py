@@ -306,7 +306,7 @@ class GithubJiraConventionalFooterCz(BaseCommitizen):
             for jira_footer in re.findall(
                 rf"^{self.jira_token}(?P<issues>.+)$",
                 parsed_message["body"],
-                re.IGNORECASE,
+                re.IGNORECASE | re.MULTILINE,
             ):
                 [
                     jira_issues.append(issue_id.strip())
