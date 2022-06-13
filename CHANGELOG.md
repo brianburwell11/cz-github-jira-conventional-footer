@@ -1,3 +1,9 @@
+## v1.0.1 (2022-06-13)
+
+### Bug Fixes
+
+- [![df29c](https://img.shields.io/badge/-df29c-%23121011.svg?style=flat-square&logo=github&logoColor=white)](https://github.com/brianburwell11/cz-github-jira-conventional-footer/commit/df29cb406a4acdcd4978bf1492725dca4dbeff29) _(build)_ fix the link to the github repo in `setup.py`
+
 ## v1.0.0 (2022-06-13)
 
 ### Bug Fixes
